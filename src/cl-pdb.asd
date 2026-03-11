@@ -5,7 +5,8 @@
   :in-order-to ((test-op (test-op #:cl-pdb/tests)))
   :serial t
   :components ((:file "package")
-	       (:file "pdb.class")))
+	       (:file "pdb.class")
+	       (:file "reader.util")))
 
 
 (asdf:defsystem #:cl-pdb/tests
