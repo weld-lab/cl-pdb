@@ -1,5 +1,6 @@
 (defpackage #:cl-pdb
-  (:use :cl))
+  (:use :cl)
+  (:shadow :atom))
 
 
 
