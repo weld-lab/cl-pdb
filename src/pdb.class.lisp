@@ -2,11 +2,9 @@
 
 
 (defclass pdb ()
-  ((pdb-sequence :initform '()
-		 :accessor pdb-sequence))
-  ((pdb-residues :initform '()
-		 :accessor pdb-residues)))
-
-
-(defmacro make-pdb ()
-  `(make-instance 'pdb))
+  ((pdb-title :initform ""
+	      :accessor pdb-title)
+   (pdb-sequence :initform '()
+		 :accessor pdb-sequence)
+   (pdb-chains :initform '()
+	       :accessor pdb-chains)))
