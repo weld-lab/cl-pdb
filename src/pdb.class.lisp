@@ -6,5 +6,5 @@
 	      :accessor pdb-title)
    (pdb-sequence :initform '()
 		 :accessor pdb-sequence)
-   (pdb-chains :initform '()
-	       :accessor pdb-chains)))
+   (pdb-residues :initform '()
+	       :accessor pdb-residues)))
