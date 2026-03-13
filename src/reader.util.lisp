@@ -12,6 +12,11 @@
 
 
 
+
+; utils
+(defun parse-float (str)
+  (car (multiple-value-list (read-from-string str))))
+
 (defun trim-or-nil (str)
   (let ((s (string-trim '(#\Space #\Tab #\Newline) str)))
     (unless (string= s "")
@@ -64,9 +69,9 @@
 	(chainID (subseq atom 21 22))
 	(resSeq (parse-integer (subseq atom 22 26)))
 	(iCode (trim-or-nil (subseq atom 26 27)))
-	(x (subseq atom 30 38))
-	(y (subseq atom 38 46))
-	(z (subseq atom 46 54))
+	(x (parse-float (subseq atom 30 38)))
+	(y (parse-float (subseq atom 38 46)))
+	(z (parse-float (subseq atom 46 54)))
 	(charge (subseq atom 78 80)))
     (make-instance 'atom
 		   :atom-name name
