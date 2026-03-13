@@ -29,6 +29,9 @@
    (atom-z :initarg :atom-z
 	   :initform nil
 	   :accessor atom-z)
+   (atom-element :initarg :atom-element
+		 :initform nil
+		 :accessor atom-element)
    (atom-charge :initarg :atom-charge
 		:initform nil
 		:accessor atom-charge)))

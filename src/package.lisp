@@ -27,6 +27,7 @@
 	   #:atom-x
 	   #:atom-y
 	   #:atom-z
+	   #:atom-element
 	   #:atom-charge))
 
 

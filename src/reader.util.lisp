@@ -66,7 +66,7 @@
 ;;; 47-54  : z          -- orthogonal Z coordinate in angstroms
 ;;; 55-60  : occupancy  -- occupancy                                  MISSING
 ;;; 61-66  : tempFactor -- temperature factor                         MISSING
-;;; 77-78  : element    -- element symbol, right-justified            MISSING
+;;; 77-78  : element    -- element symbol, right-justified            
 ;;; 79-80  : charge     -- atom charge
   (let ((serial (subseq atom 6 11))
 	(name (subseq atom 12 16))
@@ -77,6 +77,7 @@
 	(x (parse-float (subseq atom 30 38)))
 	(y (parse-float (subseq atom 38 46)))
 	(z (parse-float (subseq atom 46 54)))
+	(element (subseq atom 76 78))
 	(charge (parse-float (subseq atom 78 80))))
     (make-instance 'atom
 		   :atom-name name
@@ -86,6 +87,7 @@
 		   :atom-residue-sequence-number resSeq
 		   :atom-residue-insertion-code iCode
 		   :atom-x x :atom-y y :atom-z z
+		   :atom-element element
 		   :atom-charge charge)))
 
 (defun parse-remark (remark)
@@ -93,7 +95,7 @@
 
 
 (defun parse-hetatm (hetatm)
-  nil)
+  (parse-atom hetatm))
 
 
 (defmacro is-record-type (str)
