@@ -30,3 +30,35 @@
     (is (typep (pdb:residue-kind residue) 'keyword))
     (is (typep (pdb:residue-atoms residue) 'list))
     (is (typep (pdb:residue-additional-informations residue) 'string))))
+
+
+
+(test create-atom-from-record-atom
+  (let* ((record "ATOM   3201  CG  ARG A 242     128.003 125.608 196.380  1.00109.17           C  ")
+         (atom   (pdb::parse-atom record)))
+    ;; type global
+    (is (typep atom 'pdb:atom))
+
+    ;; valeurs
+    (is (string= " CG " (pdb:atom-name atom)))
+    (is (string= " 3201" (pdb:atom-serial atom)))
+    (is (string= "ARG"   (pdb:atom-residue-name atom)))
+    (is (string= "A"     (pdb:atom-residue-chain atom)))
+    (is (= 242           (pdb:atom-residue-sequence-number atom)))
+    (is (null            (pdb:atom-residue-insertion-code atom)))
+    (is (= 128.003       (pdb:atom-x atom)))
+    (is (= 125.608       (pdb:atom-y atom)))
+    (is (= 196.380       (pdb:atom-z atom)))
+    (is (null            (pdb:atom-charge atom)))
+
+    ;; types
+    (is (typep (pdb:atom-name atom) 'string))
+    (is (typep (pdb:atom-serial atom) 'string))
+    (is (typep (pdb:atom-residue-name atom) 'string))
+    (is (typep (pdb:atom-residue-chain atom) 'string))
+    (is (typep (pdb:atom-residue-sequence-number atom) 'integer))
+    (is (null  (pdb:atom-residue-insertion-code atom)))
+    (is (floatp (pdb:atom-x atom)))
+    (is (floatp (pdb:atom-y atom)))
+    (is (floatp (pdb:atom-z atom)))
+    (is (null   (pdb:atom-charge atom)))))

@@ -6,6 +6,7 @@
 	   #:pdb-tile
 	   #:pdb-sequence
 	   #:pdb-residues
+
 	   #:residue
 	   #:residue-name
 	   #:residue-id
@@ -15,7 +16,18 @@
 	   #:residue-kind
 	   #:residue-atoms
 	   #:residue-additional-informations
-	   #:atom))
+
+	   #:atom
+	   #:atom-name
+	   #:atom-serial
+	   #:atom-residue-name
+	   #:atom-residue-chain
+	   #:atom-residue-sequence-number
+	   #:atom-residue-insertion-code
+	   #:atom-x
+	   #:atom-y
+	   #:atom-z
+	   #:atom-charge))
 
 
 

@@ -5,6 +5,7 @@
   :in-order-to ((test-op (test-op #:cl-pdb/tests)))
   :serial t
   :components ((:file "package")
+	       (:file "atom.class")
 	       (:file "residue.class")
 	       (:file "pdb.class")
 	       (:file "reader.util")))
