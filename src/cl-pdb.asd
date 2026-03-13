@@ -17,7 +17,7 @@
   :serial t
   :depends-on ("cl-pdb" "fiveam")
   :components ((:file "tests/package")
-	       (:file "tests/general"))
+	       (:file "tests/cl-pdb.tests"))
   :perform (test-op (o c)
-	     (uiop:symbol-call :fiveam :run! :cl-pdb/tests.general)))
+	     (uiop:symbol-call :fiveam :run! :cl-pdb.tests)))
 
