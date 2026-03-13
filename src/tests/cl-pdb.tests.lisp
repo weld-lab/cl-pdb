@@ -18,7 +18,7 @@
     (is (string= "R" (pdb:residue-chain residue)))
     (is (eql :unknown (pdb:residue-kind residue)))
     (is (equal '() (pdb:residue-atoms residue)))
-    (is (string= "bla                       "
+    (is (string= "                        bla             "
                  (pdb:residue-additional-informations residue)))
 
     ;; types des slots
