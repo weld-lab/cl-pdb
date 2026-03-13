@@ -5,10 +5,21 @@
   :in-order-to ((test-op (test-op #:cl-pdb/tests)))
   :serial t
   :components ((:file "package")
-	       (:file "atom.class")
-	       (:file "residue.class")
-	       (:file "pdb.class")
-	       (:file "reader.util")))
+	       (:file "model/atom.class")
+	       (:file "model/residue.class")
+	       (:file "model/pdb.class")
+	       (:file "parse/common")
+	       (:file "parse/atom")
+	       (:file "parse/het")
+	       (:file "reader/builder")
+	       (:file "reader/ingest")
+	       (:file "reader/finalize")
+	       (:file "reader/read-pdb")
+	       (:file "normalize/residue-kind")
+	       (:file "view/atoms")
+	       (:file "view/heteros")
+	       (:file "view/residues")
+	       (:file "view/chains")))
 
 
 (asdf:defsystem #:cl-pdb/tests
