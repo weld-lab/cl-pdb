@@ -3,7 +3,7 @@
   (:use #:cl)
   (:shadow #:atom)
   (:export #:pdb
-	   #:pdb-tile
+	   #:pdb-title
 	   #:pdb-sequence
 	   #:pdb-residues
 
