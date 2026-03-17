@@ -20,7 +20,8 @@
 	       (:file "view/atoms")
 	       (:file "view/heteros")
 	       (:file "view/residues")
-	       (:file "view/chains")))
+	       (:file "view/in-chain")
+	       (:file "view/of-kind")))
 
 
 (asdf:defsystem #:cl-pdb/tests
