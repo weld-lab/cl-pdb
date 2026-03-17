@@ -10,5 +10,5 @@
   (with-open-file (file pathname :direction :input)
     (loop for record = (read-line file nil)
 	  while record collect (ingest record) into ingested
-	  finally (return (build ingested)))))
+	  finally (return (finalize (build ingested))))))
 

@@ -1,4 +1,8 @@
 (in-package #:cl-pdb)
 
-(defun finalize (x)
-  x)
+
+(defmethod finalize ((pdb pdb))
+  (loop for residue in (pdb-residues pdb)
+        do (setf (residue-kind residue)
+                 (infer-residue-kind residue)))
+  pdb)
