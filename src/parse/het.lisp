@@ -21,4 +21,5 @@
 		   :residue-insertion-code iCode
 		   :residue-chain chainID
 		   :residue-kind :unknown
-		   :residue-additional-informations text)))
+		   :residue-additional-informations text
+		   :residue-type :hetero)))

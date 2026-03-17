@@ -34,13 +34,17 @@
 		  :accessor residue-atoms)
    (residues-additional-informations :initarg :residue-additional-informations
 				     :initform ""
-				     :accessor residue-additional-informations))
+				     :accessor residue-additional-informations)
+   (residue-type :initarg :residue-type
+		 :initform :sequence
+		 :accessor residue-type))
   (:documentation "Classe qui représente un résidu, au sens structural."))
 
 
 (defmethod print-object ((obj residue) stream)
   (print-unreadable-object (obj stream)
-    (format stream "~a (~a:~a) of kind ~a in chain ~a"
+    (format stream "~a:~a (~a:~a) of kind ~a in chain ~a"
+	    (residue-type obj)
 	    (residue-name obj)
 	    (residue-sequence-number obj)
 	    (residue-insertion-code obj)

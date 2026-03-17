@@ -34,4 +34,7 @@
 		 :accessor atom-element)
    (atom-charge :initarg :atom-charge
 		:initform nil
-		:accessor atom-charge)))
+		:accessor atom-charge)
+   (atom-type :initarg :atom-type
+	      :initform :atom
+	      :accessor atom-type)))
