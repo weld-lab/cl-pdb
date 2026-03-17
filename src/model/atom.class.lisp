@@ -38,3 +38,13 @@
    (atom-type :initarg :atom-type
 	      :initform :atom
 	      :accessor atom-type)))
+
+
+
+(defmethod print-object ((obj atom) stream)
+  (print-unreadable-object (obj stream)
+    (format stream "~a (~a ; ~a ; ~a)"
+	    (atom-element obj)
+	    (atom-x obj)
+	    (atom-y obj)
+	    (atom-z obj))))
