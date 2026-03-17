@@ -18,16 +18,16 @@
 ;;; 61-66  : tempFactor -- temperature factor                         MISSING
 ;;; 77-78  : element    -- element symbol, right-justified            
 ;;; 79-80  : charge     -- atom charge
-  (let ((serial (subseq atom 6 11))
-	(name (subseq atom 12 16))
-	(resname (subseq atom 17 20))
-	(chainID (subseq atom 21 22))
+  (let ((serial (trim-or-nil  (subseq atom 6 11)))
+	(name (trim-or-nil (subseq atom 12 16)))
+	(resname (trim-or-nil (subseq atom 17 20)))
+	(chainID (trim-or-nil (subseq atom 21 22)))
 	(resSeq (parse-integer (subseq atom 22 26)))
 	(iCode (trim-or-nil (subseq atom 26 27)))
 	(x (parse-float (subseq atom 30 38)))
 	(y (parse-float (subseq atom 38 46)))
 	(z (parse-float (subseq atom 46 54)))
-	(element (subseq atom 76 78))
+	(element (trim-or-nil (subseq atom 76 78)))
 	(charge (parse-float (subseq atom 78 80))))
     (make-instance 'atom
 		   :atom-name name
@@ -41,5 +41,3 @@
 		   :atom-charge charge)))
 
 
-(defun parse-hetatm (hetatm)
-  (parse-atom hetatm))

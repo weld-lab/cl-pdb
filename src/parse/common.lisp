@@ -12,3 +12,16 @@
 	nil
 	(car (multiple-value-list (read-from-string str))))))
 
+
+
+(defun record-type (line)
+  (let ((tag (trim-or-nil (subseq line 0 6))))
+    (cond
+      ((string= tag "ATOM")   :atom)
+      ((string= tag "HETATM") :hetatm)
+      ((string= tag "HET")    :het)
+      ((string= tag "TITLE")  :title)
+      ((string= tag "REMARK") :remark)
+      ((string= tag "SEQRES") :seqres)
+      ((string= tag "HEADER") :header)
+      (t nil))))

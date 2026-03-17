@@ -3,8 +3,11 @@
 
 (defclass pdb ()
   ((pdb-title :initform ""
+	      :initarg :pdb-title
 	      :accessor pdb-title)
    (pdb-sequence :initform '()
+		 :initarg :pdb-sequence
 		 :accessor pdb-sequence)
    (pdb-residues :initform '()
-	       :accessor pdb-residues)))
+		 :initarg :pdb-residues
+		 :accessor pdb-residues)))
