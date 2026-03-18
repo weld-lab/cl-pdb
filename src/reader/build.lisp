@@ -42,19 +42,23 @@
 	    (values residue (push residue order)))))))
 
 
-
 (defun build (ingested)
   (let ((residue-index (make-hash-table :test #'equal))
-        (residue-order '()))
+        (residue-order '())
+        (title-parts '()))
     (dolist (object ingested)
       (unless (null object)
-        (multiple-value-bind (residue new-order)
-            (ensure-residue object residue-index residue-order)
-          (setf residue-order new-order)
-          (when (typep object 'atom)
-            (push object (residue-atoms residue))))))
+        (cond
+          ((typep object 'title)
+           (push (title-content object) title-parts))
+          (t
+           (multiple-value-bind (residue new-order)
+               (ensure-residue object residue-index residue-order)
+             (setf residue-order new-order)
+             (when (typep object 'atom)
+               (push object (residue-atoms residue))))))))
     (make-instance 'pdb
-                   :pdb-title nil
+                   :pdb-title (format nil "~{~a~^~%~}" (nreverse title-parts))
                    :pdb-sequence nil
                    :pdb-residues
                    (mapcar (lambda (residue)
