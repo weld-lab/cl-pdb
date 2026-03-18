@@ -3,6 +3,7 @@
 
 (5am:in-suite :cl-pdb.tests.reader)
 
+
 (test ingest/atom-record-returns-atom
   (let* ((record "ATOM      1  N   ASP A  29     -52.822  -1.611  23.137  1.00 98.48           N  ")
          (object (pdb::ingest record)))
@@ -15,6 +16,7 @@
     (is (= -1.611      (pdb:atom-y object)))
     (is (= 23.137      (pdb:atom-z object)))
     (is (string= "N"   (pdb:atom-element object)))))
+
 
 (test ingest/hetatm-record-returns-atom
   (let* ((record "HETATM11435  O1  CLR R 502     103.762 129.434 146.992  1.00 71.89           O  ")
@@ -29,6 +31,7 @@
     (is (= 146.992     (pdb:atom-z object)))
     (is (string= "O"   (pdb:atom-element object)))))
 
+
 (test ingest/het-record-returns-residue
   (let* ((record "HET    CLR  A 412      28                                                        ")
          (object (pdb::ingest record)))
@@ -41,11 +44,13 @@
     (is (equal '()    (pdb:residue-atoms object)))
     (is (typep (pdb:residue-additional-informations object) 'string))))
 
+
 (test ingest/title-record-returns-title
   (let* ((record "TITLE     FENTANYL-BOUND MU-OPIOID RECEPTOR-GI COMPLEX                          ")
          (object (pdb::ingest record)))
     (is (typep object 'pdb::title))
     (is (string= "FENTANYL-BOUND MU-OPIOID RECEPTOR-GI COMPLEX                          " (pdb::title-content object)))))
+
 
 (test ingest/title-second-line-returns-title
   (let* ((record "TITLE    2 BOUND TO AN ENGINEERED G PROTEIN                                     ")
@@ -54,25 +59,31 @@
     (is (string= " BOUND TO AN ENGINEERED G PROTEIN                                     "
                  (pdb::title-content object)))))
 
+
 (test ingest/remark-record-returns-nil
   (let ((record "REMARK   3  REFINEMENT.                                                          "))
     (is (null (pdb::ingest record)))))
+
 
 (test ingest/header-record-returns-nil
   (let ((record "HEADER    SIGNALING PROTEIN                       08-SEP-22   8EF5              "))
     (is (null (pdb::ingest record)))))
 
+
 (test ingest/seqres-record-returns-nil
   (let ((record "SEQRES   1 A  500  ASP TYR LYS ASP ASP ASP ALA MET GLY GLN PRO GLY ASN          "))
     (is (null (pdb::ingest record)))))
+
 
 (test ingest/unknown-record-returns-nil
   (let ((record "FOOBAR    SOMETHING THAT SHOULD NOT MATCH                                          "))
     (is (null (pdb::ingest record)))))
 
+
 (test ingest/blank-record-returns-nil
   (let ((record "                                                                                "))
     (is (null (pdb::ingest record)))))
+
 
 (test ingest/atom-record-preserves-atom-type
   (let* ((record "ATOM   3201  CG  ARG A 242     128.003 125.608 196.380  1.00109.17           C  ")
@@ -86,6 +97,7 @@
     (is (= 196.380     (pdb:atom-z object)))
     (is (string= "C"   (pdb:atom-element object)))))
 
+
 (test ingest/hetatm-record-goes-through-parse-atom-shape
   (let* ((record "HETATM 3722  C2  PLM A 415     -58.012  31.828   5.279  1.00 93.74           C  ")
          (object (pdb::ingest record)))
@@ -97,6 +109,7 @@
     (is (null          (pdb:atom-residue-insertion-code object)))
     (is (string= "C"   (pdb:atom-element object)))))
 
+
 (test ingest/het-record-preserves-free-text
   (let* ((record "HET    7V7  R 501      25                             bla                       ")
          (object (pdb::ingest record)))
@@ -106,6 +119,7 @@
     (is (string= "R"  (pdb:residue-chain object)))
     (is (string= "                        bla             "
                  (pdb:residue-additional-informations object)))))
+
 
 (test ingest/title-object-has-string-content
   (let* ((record "TITLE     HIGH RESOLUTION CRYSTAL STRUCTURE OF HUMAN B2-ADRENERGIC G PROTEIN-   ")
@@ -117,6 +131,7 @@
 (test residue-key/builds-structural-key
   (is (equal '("A" 42 nil "ALA")
              (pdb::residue-key "A" 42 nil "ALA"))))
+
 
 (test key-from-atom/builds-key-from-atom-slots
   (let ((atom (make-instance 'pdb:atom
@@ -134,6 +149,7 @@
     (is (equal '("A" 42 nil "ALA")
                (pdb::key-from-atom atom)))))
 
+
 (test key-from-residue/builds-key-from-residue-slots
   (let ((residue (make-instance 'pdb:residue
                                 :residue-name "ALA"
@@ -145,6 +161,7 @@
                                 :residue-additional-informations nil)))
     (is (equal '("A" 42 nil "ALA")
                (pdb::key-from-residue residue)))))
+
 
 (test ensure-residue/creates-new-residue-from-atom
   (let* ((index (make-hash-table :test #'equal))
@@ -170,6 +187,7 @@
       (is (null (pdb:residue-insertion-code residue)))
       (is (equal (list residue) new-order))
       (is (eq residue (gethash '("A" 42 nil "ALA") index))))))
+
 
 (test ensure-residue/reuses-existing-residue-from-second-atom
   (let* ((index (make-hash-table :test #'equal))
@@ -202,6 +220,7 @@
         (is (equal order-1 order-2))
         (is (= 1 (hash-table-count index)))))))
 
+
 (test ensure-residue/inserts-raw-residue-as-is
   (let* ((index (make-hash-table :test #'equal))
          (order '())
@@ -218,6 +237,7 @@
       (is (eq found residue))
       (is (equal (list residue) new-order))
       (is (eq residue (gethash '("A" 412 nil "CLR") index))))))
+
 
 (test ensure-residue/reuses-existing-residue-when-same-raw-residue-key
   (let* ((index (make-hash-table :test #'equal))
@@ -247,11 +267,13 @@
         (is (equal order-1 order-2))
         (is (= 1 (hash-table-count index)))))))
 
+
 (test ensure-residue/signals-error-on-unsupported-object
   (let ((index (make-hash-table :test #'equal))
         (order '()))
     (signals error
       (pdb::ensure-residue 42 index order))))
+
 
 (test build/returns-empty-pdb-on-empty-ingested
   (let ((pdb (pdb::build '())))
@@ -259,6 +281,7 @@
     (is (string= "" (pdb:pdb-title pdb)))
     (is (null (pdb:pdb-sequence pdb)))
     (is (equal '() (pdb:pdb-residues pdb)))))
+
 
 (test build/ignores-nil-objects
   (let* ((atom (make-instance 'pdb:atom
@@ -274,6 +297,7 @@
          (pdb (pdb::build (list nil atom nil))))
     (is (= 1 (length (pdb:pdb-residues pdb))))
     (is (= 1 (length (pdb:residue-atoms (first (pdb:pdb-residues pdb))))))))
+
 
 (test build/groups-two-atoms-into-one-residue
   (let* ((atom-1 (make-instance 'pdb:atom
@@ -305,6 +329,7 @@
     (is (string= "N"  (pdb:atom-name (first atoms))))
     (is (string= "CA" (pdb:atom-name (second atoms))))))
 
+
 (test build/creates-two-residues-for-different-keys
   (let* ((atom-1 (make-instance 'pdb:atom
                                 :atom-name "N"
@@ -331,6 +356,7 @@
     (is (= 2 (length residues)))
     (is (string= "ALA" (pdb:residue-name (first residues))))
     (is (string= "GLY" (pdb:residue-name (second residues))))))
+
 
 (test build/preserves-residue-order-from-first-appearance
   (let* ((atom-1 (make-instance 'pdb:atom
@@ -368,6 +394,7 @@
     (is (= 2 (length residues)))
     (is (string= "GLY" (pdb:residue-name (first residues))))
     (is (string= "ALA" (pdb:residue-name (second residues))))))
+
 
 (test build/keeps-existing-residue-from-het-and-attaches-atoms-to-it
   (let* ((het (make-instance 'pdb:residue
@@ -407,6 +434,7 @@
     (is (string= "C2" (pdb:atom-name (second (pdb:residue-atoms residue)))))
     (is (string= "cholesterol" (pdb:residue-additional-informations residue)))))
 
+
 (test build/concatenates-title-records-with-newlines
   (let* ((title-1 (make-instance 'pdb::title
                                  :title-content "FIRST TITLE LINE"))
@@ -416,6 +444,7 @@
     (is (string= "FIRST TITLE LINE
 SECOND TITLE LINE"
                  (pdb:pdb-title pdb)))))
+
 
 (test build/mixes-title-and-structural-objects
   (let* ((title (make-instance 'pdb::title
@@ -434,3 +463,166 @@ SECOND TITLE LINE"
     (is (string= "MY TITLE" (pdb:pdb-title pdb)))
     (is (= 1 (length (pdb:pdb-residues pdb))))
     (is (string= "GLY" (pdb:residue-name (first (pdb:pdb-residues pdb)))))))
+
+
+(test finalize/returns-same-pdb-instance
+  (let* ((residue (make-instance 'pdb:residue
+                                 :residue-name "ALA"
+                                 :residue-sequence-number 1
+                                 :residue-insertion-code nil
+                                 :residue-chain "A"
+                                 :residue-kind nil
+                                 :residue-atoms '()
+                                 :residue-additional-informations nil))
+         (pdb (make-instance 'pdb:pdb
+                             :pdb-title nil
+                             :pdb-sequence nil
+                             :pdb-residues (list residue))))
+    (is (eq pdb (pdb::finalize pdb)))))
+
+
+(test finalize/assigns-amino-acid-kind
+  (let* ((residue (make-instance 'pdb:residue
+                                 :residue-name "ALA"
+                                 :residue-sequence-number 1
+                                 :residue-insertion-code nil
+                                 :residue-chain "A"
+                                 :residue-kind nil
+                                 :residue-atoms '()
+                                 :residue-additional-informations nil))
+         (pdb (make-instance 'pdb:pdb
+                             :pdb-title nil
+                             :pdb-sequence nil
+                             :pdb-residues (list residue))))
+    (pdb::finalize pdb)
+    (is (eql :amino-acid (pdb:residue-kind residue)))))
+
+
+(test finalize/assigns-water-kind
+  (let* ((residue (make-instance 'pdb:residue
+                                 :residue-name "HOH"
+                                 :residue-sequence-number 10
+                                 :residue-insertion-code nil
+                                 :residue-chain "A"
+                                 :residue-kind nil
+                                 :residue-atoms '()
+                                 :residue-additional-informations nil))
+         (pdb (make-instance 'pdb:pdb
+                             :pdb-title nil
+                             :pdb-sequence nil
+                             :pdb-residues (list residue))))
+    (pdb::finalize pdb)
+    (is (eql :water (pdb:residue-kind residue)))))
+
+
+(test finalize/assigns-ion-kind
+  (let* ((residue (make-instance 'pdb:residue
+                                 :residue-name "NA"
+                                 :residue-sequence-number 20
+                                 :residue-insertion-code nil
+                                 :residue-chain "A"
+                                 :residue-kind nil
+                                 :residue-atoms '()
+                                 :residue-additional-informations nil))
+         (pdb (make-instance 'pdb:pdb
+                             :pdb-title nil
+                             :pdb-sequence nil
+                             :pdb-residues (list residue))))
+    (pdb::finalize pdb)
+    (is (eql :ion (pdb:residue-kind residue)))))
+
+
+(test finalize/assigns-lipid-kind
+  (let* ((residue (make-instance 'pdb:residue
+                                 :residue-name "CLR"
+                                 :residue-sequence-number 412
+                                 :residue-insertion-code nil
+                                 :residue-chain "A"
+                                 :residue-kind nil
+                                 :residue-atoms '()
+                                 :residue-additional-informations "cholesterol"))
+         (pdb (make-instance 'pdb:pdb
+                             :pdb-title nil
+                             :pdb-sequence nil
+                             :pdb-residues (list residue))))
+    (pdb::finalize pdb)
+    (is (eql :lipid (pdb:residue-kind residue)))))
+
+
+(test finalize/assigns-unknown-kind-for-unclassified-residue
+  (let* ((residue (make-instance 'pdb:residue
+                                 :residue-name "7V7"
+                                 :residue-sequence-number 501
+                                 :residue-insertion-code nil
+                                 :residue-chain "R"
+                                 :residue-kind nil
+                                 :residue-atoms '()
+                                 :residue-additional-informations "ligand"))
+         (pdb (make-instance 'pdb:pdb
+                             :pdb-title nil
+                             :pdb-sequence nil
+                             :pdb-residues (list residue))))
+    (pdb::finalize pdb)
+    (is (eql :unknown (pdb:residue-kind residue)))))
+
+
+(test finalize/normalizes-multiple-residues-in-one-pass
+  (let* ((ala (make-instance 'pdb:residue
+                             :residue-name "ALA"
+                             :residue-sequence-number 1
+                             :residue-insertion-code nil
+                             :residue-chain "A"
+                             :residue-kind nil
+                             :residue-atoms '()
+                             :residue-additional-informations nil))
+         (hoh (make-instance 'pdb:residue
+                             :residue-name "HOH"
+                             :residue-sequence-number 2
+                             :residue-insertion-code nil
+                             :residue-chain "A"
+                             :residue-kind nil
+                             :residue-atoms '()
+                             :residue-additional-informations nil))
+         (clr (make-instance 'pdb:residue
+                             :residue-name "CLR"
+                             :residue-sequence-number 3
+                             :residue-insertion-code nil
+                             :residue-chain "A"
+                             :residue-kind nil
+                             :residue-atoms '()
+                             :residue-additional-informations nil))
+         (unk (make-instance 'pdb:residue
+                             :residue-name "7V7"
+                             :residue-sequence-number 4
+                             :residue-insertion-code nil
+                             :residue-chain "A"
+                             :residue-kind nil
+                             :residue-atoms '()
+                             :residue-additional-informations nil))
+         (pdb (make-instance 'pdb:pdb
+                             :pdb-title nil
+                             :pdb-sequence nil
+                             :pdb-residues (list ala hoh clr unk))))
+    (pdb::finalize pdb)
+    (is (eql :amino-acid (pdb:residue-kind ala)))
+    (is (eql :water      (pdb:residue-kind hoh)))
+    (is (eql :lipid      (pdb:residue-kind clr)))
+    (is (eql :unknown    (pdb:residue-kind unk)))))
+
+
+(test finalize/does-not-change-pdb-title-or-sequence
+  (let* ((residue (make-instance 'pdb:residue
+                                 :residue-name "ALA"
+                                 :residue-sequence-number 1
+                                 :residue-insertion-code nil
+                                 :residue-chain "A"
+                                 :residue-kind nil
+                                 :residue-atoms '()
+                                 :residue-additional-informations nil))
+         (pdb (make-instance 'pdb:pdb
+                             :pdb-title "MY TITLE"
+                             :pdb-sequence "MY SEQUENCE"
+                             :pdb-residues (list residue))))
+    (pdb::finalize pdb)
+    (is (string= "MY TITLE" (pdb:pdb-title pdb)))
+    (is (string= "MY SEQUENCE" (pdb:pdb-sequence pdb)))))
