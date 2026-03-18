@@ -58,7 +58,7 @@
              (when (typep object 'atom)
                (push object (residue-atoms residue))))))))
     (make-instance 'pdb
-                   :pdb-title (format nil "~{~a~^~%~}" (nreverse title-parts))
+                   :pdb-title (format nil "~{~a~}" (nreverse title-parts))
                    :pdb-sequence nil
                    :pdb-residues
                    (mapcar (lambda (residue)
