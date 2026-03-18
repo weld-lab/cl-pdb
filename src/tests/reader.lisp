@@ -112,3 +112,325 @@
          (object (pdb::ingest record)))
     (is (typep object 'pdb::title))
     (is (typep (pdb::title-content object) 'string))))
+
+
+(test residue-key/builds-structural-key
+  (is (equal '("A" 42 nil "ALA")
+             (pdb::residue-key "A" 42 nil "ALA"))))
+
+(test key-from-atom/builds-key-from-atom-slots
+  (let ((atom (make-instance 'pdb:atom
+                             :atom-name "CA"
+                             :atom-serial "1"
+                             :atom-residue-name "ALA"
+                             :atom-residue-chain "A"
+                             :atom-residue-sequence-number 42
+                             :atom-residue-insertion-code nil
+                             :atom-x 1.0
+                             :atom-y 2.0
+                             :atom-z 3.0
+                             :atom-element "C"
+                             :atom-charge nil)))
+    (is (equal '("A" 42 nil "ALA")
+               (pdb::key-from-atom atom)))))
+
+(test key-from-residue/builds-key-from-residue-slots
+  (let ((residue (make-instance 'pdb:residue
+                                :residue-name "ALA"
+                                :residue-sequence-number 42
+                                :residue-insertion-code nil
+                                :residue-chain "A"
+                                :residue-kind :unknown
+                                :residue-atoms '()
+                                :residue-additional-informations nil)))
+    (is (equal '("A" 42 nil "ALA")
+               (pdb::key-from-residue residue)))))
+
+(test ensure-residue/creates-new-residue-from-atom
+  (let* ((index (make-hash-table :test #'equal))
+         (order '())
+         (atom (make-instance 'pdb:atom
+                              :atom-name "CA"
+                              :atom-serial "1"
+                              :atom-residue-name "ALA"
+                              :atom-residue-chain "A"
+                              :atom-residue-sequence-number 42
+                              :atom-residue-insertion-code nil
+                              :atom-x 1.0
+                              :atom-y 2.0
+                              :atom-z 3.0
+                              :atom-element "C"
+                              :atom-charge nil)))
+    (multiple-value-bind (residue new-order)
+        (pdb::ensure-residue atom index order)
+      (is (typep residue 'pdb:residue))
+      (is (string= "ALA" (pdb:residue-name residue)))
+      (is (= 42 (pdb:residue-sequence-number residue)))
+      (is (string= "A" (pdb:residue-chain residue)))
+      (is (null (pdb:residue-insertion-code residue)))
+      (is (equal (list residue) new-order))
+      (is (eq residue (gethash '("A" 42 nil "ALA") index))))))
+
+(test ensure-residue/reuses-existing-residue-from-second-atom
+  (let* ((index (make-hash-table :test #'equal))
+         (order '())
+         (atom-1 (make-instance 'pdb:atom
+                                :atom-name "N"
+                                :atom-serial "1"
+                                :atom-residue-name "ALA"
+                                :atom-residue-chain "A"
+                                :atom-residue-sequence-number 42
+                                :atom-residue-insertion-code nil
+                                :atom-x 1.0 :atom-y 2.0 :atom-z 3.0
+                                :atom-element "N"
+                                :atom-charge nil))
+         (atom-2 (make-instance 'pdb:atom
+                                :atom-name "CA"
+                                :atom-serial "2"
+                                :atom-residue-name "ALA"
+                                :atom-residue-chain "A"
+                                :atom-residue-sequence-number 42
+                                :atom-residue-insertion-code nil
+                                :atom-x 4.0 :atom-y 5.0 :atom-z 6.0
+                                :atom-element "C"
+                                :atom-charge nil)))
+    (multiple-value-bind (residue-1 order-1)
+        (pdb::ensure-residue atom-1 index order)
+      (multiple-value-bind (residue-2 order-2)
+          (pdb::ensure-residue atom-2 index order-1)
+        (is (eq residue-1 residue-2))
+        (is (equal order-1 order-2))
+        (is (= 1 (hash-table-count index)))))))
+
+(test ensure-residue/inserts-raw-residue-as-is
+  (let* ((index (make-hash-table :test #'equal))
+         (order '())
+         (residue (make-instance 'pdb:residue
+                                 :residue-name "CLR"
+                                 :residue-sequence-number 412
+                                 :residue-insertion-code nil
+                                 :residue-chain "A"
+                                 :residue-kind :unknown
+                                 :residue-atoms '()
+                                 :residue-additional-informations "cholesterol")))
+    (multiple-value-bind (found new-order)
+        (pdb::ensure-residue residue index order)
+      (is (eq found residue))
+      (is (equal (list residue) new-order))
+      (is (eq residue (gethash '("A" 412 nil "CLR") index))))))
+
+(test ensure-residue/reuses-existing-residue-when-same-raw-residue-key
+  (let* ((index (make-hash-table :test #'equal))
+         (order '())
+         (residue-1 (make-instance 'pdb:residue
+                                   :residue-name "CLR"
+                                   :residue-sequence-number 412
+                                   :residue-insertion-code nil
+                                   :residue-chain "A"
+                                   :residue-kind :unknown
+                                   :residue-atoms '()
+                                   :residue-additional-informations "first"))
+         (residue-2 (make-instance 'pdb:residue
+                                   :residue-name "CLR"
+                                   :residue-sequence-number 412
+                                   :residue-insertion-code nil
+                                   :residue-chain "A"
+                                   :residue-kind :unknown
+                                   :residue-atoms '()
+                                   :residue-additional-informations "second")))
+    (multiple-value-bind (found-1 order-1)
+        (pdb::ensure-residue residue-1 index order)
+      (multiple-value-bind (found-2 order-2)
+          (pdb::ensure-residue residue-2 index order-1)
+        (is (eq found-1 residue-1))
+        (is (eq found-2 residue-1))
+        (is (equal order-1 order-2))
+        (is (= 1 (hash-table-count index)))))))
+
+(test ensure-residue/signals-error-on-unsupported-object
+  (let ((index (make-hash-table :test #'equal))
+        (order '()))
+    (signals error
+      (pdb::ensure-residue 42 index order))))
+
+(test build/returns-empty-pdb-on-empty-ingested
+  (let ((pdb (pdb::build '())))
+    (is (typep pdb 'pdb:pdb))
+    (is (string= "" (pdb:pdb-title pdb)))
+    (is (null (pdb:pdb-sequence pdb)))
+    (is (equal '() (pdb:pdb-residues pdb)))))
+
+(test build/ignores-nil-objects
+  (let* ((atom (make-instance 'pdb:atom
+                              :atom-name "CA"
+                              :atom-serial "1"
+                              :atom-residue-name "ALA"
+                              :atom-residue-chain "A"
+                              :atom-residue-sequence-number 42
+                              :atom-residue-insertion-code nil
+                              :atom-x 1.0 :atom-y 2.0 :atom-z 3.0
+                              :atom-element "C"
+                              :atom-charge nil))
+         (pdb (pdb::build (list nil atom nil))))
+    (is (= 1 (length (pdb:pdb-residues pdb))))
+    (is (= 1 (length (pdb:residue-atoms (first (pdb:pdb-residues pdb))))))))
+
+(test build/groups-two-atoms-into-one-residue
+  (let* ((atom-1 (make-instance 'pdb:atom
+                                :atom-name "N"
+                                :atom-serial "1"
+                                :atom-residue-name "ALA"
+                                :atom-residue-chain "A"
+                                :atom-residue-sequence-number 42
+                                :atom-residue-insertion-code nil
+                                :atom-x 1.0 :atom-y 2.0 :atom-z 3.0
+                                :atom-element "N"
+                                :atom-charge nil))
+         (atom-2 (make-instance 'pdb:atom
+                                :atom-name "CA"
+                                :atom-serial "2"
+                                :atom-residue-name "ALA"
+                                :atom-residue-chain "A"
+                                :atom-residue-sequence-number 42
+                                :atom-residue-insertion-code nil
+                                :atom-x 4.0 :atom-y 5.0 :atom-z 6.0
+                                :atom-element "C"
+                                :atom-charge nil))
+         (pdb (pdb::build (list atom-1 atom-2)))
+         (residues (pdb:pdb-residues pdb))
+         (residue (first residues))
+         (atoms (pdb:residue-atoms residue)))
+    (is (= 1 (length residues)))
+    (is (= 2 (length atoms)))
+    (is (string= "N"  (pdb:atom-name (first atoms))))
+    (is (string= "CA" (pdb:atom-name (second atoms))))))
+
+(test build/creates-two-residues-for-different-keys
+  (let* ((atom-1 (make-instance 'pdb:atom
+                                :atom-name "N"
+                                :atom-serial "1"
+                                :atom-residue-name "ALA"
+                                :atom-residue-chain "A"
+                                :atom-residue-sequence-number 42
+                                :atom-residue-insertion-code nil
+                                :atom-x 1.0 :atom-y 2.0 :atom-z 3.0
+                                :atom-element "N"
+                                :atom-charge nil))
+         (atom-2 (make-instance 'pdb:atom
+                                :atom-name "N"
+                                :atom-serial "2"
+                                :atom-residue-name "GLY"
+                                :atom-residue-chain "A"
+                                :atom-residue-sequence-number 43
+                                :atom-residue-insertion-code nil
+                                :atom-x 4.0 :atom-y 5.0 :atom-z 6.0
+                                :atom-element "N"
+                                :atom-charge nil))
+         (pdb (pdb::build (list atom-1 atom-2)))
+         (residues (pdb:pdb-residues pdb)))
+    (is (= 2 (length residues)))
+    (is (string= "ALA" (pdb:residue-name (first residues))))
+    (is (string= "GLY" (pdb:residue-name (second residues))))))
+
+(test build/preserves-residue-order-from-first-appearance
+  (let* ((atom-1 (make-instance 'pdb:atom
+                                :atom-name "N"
+                                :atom-serial "1"
+                                :atom-residue-name "GLY"
+                                :atom-residue-chain "A"
+                                :atom-residue-sequence-number 10
+                                :atom-residue-insertion-code nil
+                                :atom-x 1.0 :atom-y 2.0 :atom-z 3.0
+                                :atom-element "N"
+                                :atom-charge nil))
+         (atom-2 (make-instance 'pdb:atom
+                                :atom-name "N"
+                                :atom-serial "2"
+                                :atom-residue-name "ALA"
+                                :atom-residue-chain "A"
+                                :atom-residue-sequence-number 11
+                                :atom-residue-insertion-code nil
+                                :atom-x 4.0 :atom-y 5.0 :atom-z 6.0
+                                :atom-element "N"
+                                :atom-charge nil))
+         (atom-3 (make-instance 'pdb:atom
+                                :atom-name "CA"
+                                :atom-serial "3"
+                                :atom-residue-name "GLY"
+                                :atom-residue-chain "A"
+                                :atom-residue-sequence-number 10
+                                :atom-residue-insertion-code nil
+                                :atom-x 7.0 :atom-y 8.0 :atom-z 9.0
+                                :atom-element "C"
+                                :atom-charge nil))
+         (pdb (pdb::build (list atom-1 atom-2 atom-3)))
+         (residues (pdb:pdb-residues pdb)))
+    (is (= 2 (length residues)))
+    (is (string= "GLY" (pdb:residue-name (first residues))))
+    (is (string= "ALA" (pdb:residue-name (second residues))))))
+
+(test build/keeps-existing-residue-from-het-and-attaches-atoms-to-it
+  (let* ((het (make-instance 'pdb:residue
+                             :residue-name "CLR"
+                             :residue-sequence-number 412
+                             :residue-insertion-code nil
+                             :residue-chain "A"
+                             :residue-kind :unknown
+                             :residue-atoms '()
+                             :residue-additional-informations "cholesterol"))
+         (atom-1 (make-instance 'pdb:atom
+                                :atom-name "C1"
+                                :atom-serial "10"
+                                :atom-residue-name "CLR"
+                                :atom-residue-chain "A"
+                                :atom-residue-sequence-number 412
+                                :atom-residue-insertion-code nil
+                                :atom-x 1.0 :atom-y 2.0 :atom-z 3.0
+                                :atom-element "C"
+                                :atom-charge nil))
+         (atom-2 (make-instance 'pdb:atom
+                                :atom-name "C2"
+                                :atom-serial "11"
+                                :atom-residue-name "CLR"
+                                :atom-residue-chain "A"
+                                :atom-residue-sequence-number 412
+                                :atom-residue-insertion-code nil
+                                :atom-x 4.0 :atom-y 5.0 :atom-z 6.0
+                                :atom-element "C"
+                                :atom-charge nil))
+         (pdb (pdb::build (list het atom-1 atom-2)))
+         (residue (first (pdb:pdb-residues pdb))))
+    (is (= 1 (length (pdb:pdb-residues pdb))))
+    (is (eq residue het))
+    (is (= 2 (length (pdb:residue-atoms residue))))
+    (is (string= "C1" (pdb:atom-name (first (pdb:residue-atoms residue)))))
+    (is (string= "C2" (pdb:atom-name (second (pdb:residue-atoms residue)))))
+    (is (string= "cholesterol" (pdb:residue-additional-informations residue)))))
+
+(test build/concatenates-title-records-with-newlines
+  (let* ((title-1 (make-instance 'pdb::title
+                                 :title-content "FIRST TITLE LINE"))
+         (title-2 (make-instance 'pdb::title
+                                 :title-content "SECOND TITLE LINE"))
+         (pdb (pdb::build (list title-1 title-2))))
+    (is (string= "FIRST TITLE LINE
+SECOND TITLE LINE"
+                 (pdb:pdb-title pdb)))))
+
+(test build/mixes-title-and-structural-objects
+  (let* ((title (make-instance 'pdb::title
+                               :title-content "MY TITLE"))
+         (atom (make-instance 'pdb:atom
+                              :atom-name "N"
+                              :atom-serial "1"
+                              :atom-residue-name "GLY"
+                              :atom-residue-chain "A"
+                              :atom-residue-sequence-number 10
+                              :atom-residue-insertion-code nil
+                              :atom-x 1.0 :atom-y 2.0 :atom-z 3.0
+                              :atom-element "N"
+                              :atom-charge nil))
+         (pdb (pdb::build (list title atom))))
+    (is (string= "MY TITLE" (pdb:pdb-title pdb)))
+    (is (= 1 (length (pdb:pdb-residues pdb))))
+    (is (string= "GLY" (pdb:residue-name (first (pdb:pdb-residues pdb)))))))

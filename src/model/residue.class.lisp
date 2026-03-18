@@ -31,6 +31,7 @@
 		 :accessor residue-kind
 		 :documentation "Contient un keyword 'métier', par exemple :water, :ligand ou :amino-acids. On a :other pour ceux qui n'entrent pas dans les catégories à définir, et :unknown quand pas encore défini. Faudra bien sûr passer par une étape de normalisation ; ex H2O et HOH entrent dans le residue-kind :water.")
    (residue-atoms :initform '()
+		  :initarg :residue-atoms
 		  :accessor residue-atoms)
    (residues-additional-informations :initarg :residue-additional-informations
 				     :initform ""
