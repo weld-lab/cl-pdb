@@ -11,3 +11,6 @@
    (pdb-residues :initform '()
 		 :initarg :pdb-residues
 		 :accessor pdb-residues)))
+
+
+
