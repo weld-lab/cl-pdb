@@ -71,6 +71,10 @@
   (pad-left (string-upcase (safe-string element)) 2))
 
 
+(defun pdb-charge-field (charge)
+  (pad-left (safe-string charge) 2))
+
+
 (defun write-title-records (stream title)
   (when title
     (let* ((text (safe-string title))
@@ -88,26 +92,27 @@
 
 
 (defun write-atom (stream atom residue)
-  "Faudra modifier si on finit par parser toutes les missing lines."
-  (let* ((record  (residue-type-to-string residue))
-         (serial  (safe-integer (atom-serial atom)))
-         (name    (pdb-atom-name-field (atom-name atom)))
-         (resname (pdb-residue-name-field (residue-name residue)))
-         (chain   (pdb-chain-field (residue-chain residue)))
-         (resseq  (or (residue-sequence-number residue) 0))
-         (icode   (pdb-icode-field (residue-insertion-code residue)))
-         (x       (safe-float (atom-x atom)))
-         (y       (safe-float (atom-y atom)))
-         (z       (safe-float (atom-z atom)))
-         (occupancy 1.00)
-         (temp-factor 0.00)
-         (element (pdb-element-field (atom-element atom)))
-         (charge  "  "))
+  (let* ((record      (residue-type-to-string residue))
+         (serial      (safe-integer (atom-serial atom)))
+         (name        (pdb-atom-name-field (atom-name atom)))
+         (altloc      (pdb-altloc-field (atom-alternative-location atom)))
+         (resname     (pdb-residue-name-field (residue-name residue)))
+         (chain       (pdb-chain-field (residue-chain residue)))
+         (resseq      (or (residue-sequence-number residue) 0))
+         (icode       (pdb-icode-field (residue-insertion-code residue)))
+         (x           (safe-float (atom-x atom)))
+         (y           (safe-float (atom-y atom)))
+         (z           (safe-float (atom-z atom)))
+         (occupancy   (safe-float (atom-occupancy atom)))
+         (temp-factor (safe-float (atom-temperature-factor atom)))
+         (element     (pdb-element-field (atom-element atom)))
+         (charge      (pdb-charge-field (atom-charge atom))))
     (format stream
-            "~6A~5D ~4A ~3A ~1A~4D~1A   ~8,3F~8,3F~8,3F~6,2F~6,2F          ~2A~2A~%"
+            "~6A~5D ~4A~1A~3A ~1A~4D~1A   ~8,3F~8,3F~8,3F~6,2F~6,2F          ~2A~2A~%"
             record
             serial
             name
+            altloc
             resname
             chain
             resseq
