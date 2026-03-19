@@ -8,4 +8,5 @@
     (:atom   (parse-atom record))
     (:hetatm (parse-hetatm record))
     (:het    (parse-het record))
+    (:seqres (parse-seqres record))
     (otherwise nil)))
