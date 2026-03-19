@@ -23,7 +23,8 @@
 	       (:file "view/heteros")
 	       (:file "view/residues")
 	       (:file "view/in-chain")
-	       (:file "view/of-kind")))
+	       (:file "view/of-kind")
+	       (:file "writer/write-pdb")))
 
 
 (asdf:defsystem #:cl-pdb/tests
