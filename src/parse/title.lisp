@@ -6,6 +6,6 @@
 ;;; 1-6    : record name  ("TITLE")
 ;;; 9-10   : continuation -- allows concatenation of multiple records    MISSING
 ;;; 11-80  : title        -- title of the experiment
-  (let ((content (subseq record 10 80)))
+  (let ((content (subseq record 10 (min 80 (length record)))))
     (make-instance 'title
 		   :title-content content)))
