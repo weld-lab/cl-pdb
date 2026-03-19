@@ -33,7 +33,7 @@
    (residue-atoms :initform '()
 		  :initarg :residue-atoms
 		  :accessor residue-atoms)
-   (residues-additional-informations :initarg :residue-additional-informations
+   (residue-additional-informations :initarg :residue-additional-informations
 				     :initform ""
 				     :accessor residue-additional-informations)
    (residue-type :initarg :residue-type
