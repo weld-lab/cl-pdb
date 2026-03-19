@@ -24,8 +24,7 @@
 	       (:file "view/atoms")
 	       (:file "view/heteros")
 	       (:file "view/residues")
-	       (:file "view/in-chain")
-	       (:file "view/of-kind")
+	       (:file "view/pipe")
 	       (:file "writer/write-pdb")))
 
 
