@@ -71,6 +71,10 @@
   (pad-left (string-upcase (safe-string element)) 2))
 
 
+(defun pdb-altloc-field (altloc)
+  (truncate-right (safe-char-string altloc) 1))
+
+
 (defun pdb-charge-field (charge)
   (pad-left (safe-string charge) 2))
 
