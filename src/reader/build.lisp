@@ -1,7 +1,9 @@
 (in-package #:cl-pdb)
 
+
 (defun residue-key (chain seqNum insertion-code name)
   (list chain seqNum insertion-code name))
+
 
 (defun key-from-atom (atom)
   (residue-key
@@ -10,12 +12,14 @@
    (atom-residue-insertion-code atom)
    (atom-residue-name atom)))
 
+
 (defun key-from-residue (residue)
   (residue-key
    (residue-chain residue)
    (residue-sequence-number residue)
    (residue-insertion-code residue)
    (residue-name residue)))
+
 
 (defun ensure-residue (object index order)
   (macrolet ((is (type)
@@ -43,6 +47,7 @@
 (defun build-title (title title-parts)
   (push (title-content title) title-parts))
 
+
 (defun build-seqres (seqres sequence-index sequence-order)
   (let* ((chain (seqres-chain seqres))
          (known (gethash chain sequence-index)))
@@ -53,6 +58,7 @@
           (append known (seqres-residue-names seqres)))
     sequence-order))
 
+
 (defun build-structural-object (object residue-index residue-order)
   (multiple-value-bind (residue new-order)
       (ensure-residue object residue-index residue-order)
@@ -60,12 +66,15 @@
       (push object (residue-atoms residue)))
     new-order))
 
+
 (defun assemble-title (title-parts)
   (format nil "~{~a~}" (nreverse title-parts)))
+
 
 (defun assemble-sequence (sequence-index sequence-order)
   (loop for chain in (nreverse sequence-order)
         collect (cons chain (gethash chain sequence-index))))
+
 
 (defun assemble-residues (residue-order)
   (mapcar (lambda (residue)
@@ -73,6 +82,7 @@
                   (nreverse (residue-atoms residue)))
             residue)
           (nreverse residue-order)))
+
 
 (defun build (ingested)
   (let ((residue-index (make-hash-table :test #'equal))
