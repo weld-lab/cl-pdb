@@ -5,6 +5,9 @@
   ((atom-name :initarg :atom-name
 	      :initform nil
 	      :accessor atom-name)
+   (atom-alternative-location :initarg :atom-alternative-location
+			      :initform nil
+			      :accessor atom-alternative-location)
    (atom-serial :initarg :atom-serial
 		:initform nil
 		:accessor atom-serial)
@@ -29,6 +32,12 @@
    (atom-z :initarg :atom-z
 	   :initform nil
 	   :accessor atom-z)
+   (atom-occupancy :initarg :atom-occupancy
+		   :initform nil
+		   :accessor atom-occupancy)
+   (atom-temperature-factor :initarg :atom-temperature-factor
+			    :initform nil
+			    :accessor atom-temperature-factor)
    (atom-element :initarg :atom-element
 		 :initform nil
 		 :accessor atom-element)
